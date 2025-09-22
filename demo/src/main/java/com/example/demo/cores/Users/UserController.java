@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +19,6 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/users")
@@ -30,7 +28,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping()
-    public List<Users> Get(@ModelAttribute QueryUsersDto queryDto) {
+    public List<Users> Get(QueryUsersDto queryDto) {
         return userService.Get(queryDto);
     }
 
@@ -55,13 +53,13 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/pwd")
-    public Users UpdatePwd(@RequestBody UpdateUsersPwdDto updateDto, @PathVariable Long id) {
+    public Users UpdatePwd(@RequestBody UpdateUsersPwdDto updateDto,
+            @PathVariable Long id) {
         return userService.UpdatePwd(updateDto, id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> Delete(@PathVariable Long id) {
+    public void Delete(@PathVariable Long id) {
         userService.Delete(id);
-        return ResponseEntity.noContent().build();
     }
 }
