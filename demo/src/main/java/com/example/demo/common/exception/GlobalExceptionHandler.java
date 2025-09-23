@@ -17,11 +17,11 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<GenericResponse<Object>> handleBusinessException(BusinessException e) {
-        System.err.println("Business Exception: " + e.getDescription());
+        System.err.println("Business Exception: " + e.getMessage());
         GenericResponse<Object> response = GenericResponse.GetErrorResponse(
                 e.getCode(),
-                e.getDescription(),
-                "業務異常");
+                e.getMessage(),
+                e.getDescription());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 

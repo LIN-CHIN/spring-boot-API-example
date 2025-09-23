@@ -12,8 +12,6 @@ import com.example.demo.cores.Users.dtos.UpdateUsersPwdDto;
 import com.example.demo.cores.Users.repositories.UsersRepository;
 import com.example.demo.cores.Users.specification.UserSpecification;
 
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 import java.util.List;
 import com.example.demo.common.responses.ResponseCode;
 
@@ -52,7 +50,8 @@ public class UserService {
     public Users Update(UpdateUsersDto updateDto, Long id) {
         Users users = usersRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with id: " + id));
+                        () -> new BusinessException(ResponseCode.NOT_FOUND_ID,
+                                "User not found with id: " + id));
 
         users = updateDto.UpdateEntity(users);
         return usersRepository.save(users);
@@ -61,22 +60,19 @@ public class UserService {
     public Users UpdatePwd(UpdateUsersPwdDto updateDto, Long id) {
         Users users = usersRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with id: " + id));
+                        () -> new BusinessException(ResponseCode.NOT_FOUND_ID,
+                                "User not found with id: " + id));
 
         users = updateDto.UpdateEntity(users);
         return usersRepository.save(users);
     }
 
     public void Delete(Long id) {
-        try {
-            Users users = usersRepository.findById(id)
-                    .orElseThrow(
-                            () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with id: " + id));
+        Users users = usersRepository.findById(id)
+                .orElseThrow(
+                        () -> new BusinessException(ResponseCode.NOT_FOUND_ID,
+                                "User not found with id: " + id));
 
-            usersRepository.delete(users);
-        } catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with id: " + id);
-        }
-
+        usersRepository.delete(users);
     }
 }
