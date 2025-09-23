@@ -1,7 +1,11 @@
 package com.example.demo.common.responses;
 
 public enum ResponseCode {
-    SUCCESS(0, "成功");
+    SUCCESS(0, "成功"),
+    SYSTEM_ERROR(1, "系统錯誤"),
+    METHOD_NOT_ALLOWED(405, "方法不被支持"),
+    NOT_FOUND_ID(10001, "找不到id"),
+    NOT_FOUND_NAME(10002, "找不到name");
 
     private final int code;
     private final String message;
@@ -15,7 +19,7 @@ public enum ResponseCode {
         return code;
     }
 
-    public String getMessage() {
+    public String getDescription() {
         return message;
     }
 

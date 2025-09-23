@@ -3,6 +3,7 @@ package com.example.demo.cores.Users.services;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.common.exception.BusinessException;
 import com.example.demo.cores.Users.Users;
 import com.example.demo.cores.Users.dtos.InsertUsersDto;
 import com.example.demo.cores.Users.dtos.QueryUsersDto;
@@ -14,6 +15,7 @@ import com.example.demo.cores.Users.specification.UserSpecification;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import java.util.List;
+import com.example.demo.common.responses.ResponseCode;
 
 @Service
 public class UserService {
@@ -32,13 +34,15 @@ public class UserService {
     public Users GetById(Long id) {
         return usersRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with id: " + id));
+                        () -> new BusinessException(ResponseCode.NOT_FOUND_ID,
+                                "User not found with id: " + id));
     }
 
     public Users GetByName(String name) {
         return usersRepository.findByName(name)
                 .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with name: " + name));
+                        () -> new BusinessException(ResponseCode.NOT_FOUND_NAME,
+                                "User not found with name: " + name));
     }
 
     public Users Create(InsertUsersDto insertDto) {

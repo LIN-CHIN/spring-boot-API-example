@@ -11,4 +11,8 @@ public abstract class BaseResponse {
     @Getter
     @Setter
     private String message;
+
+    @Getter
+    @Setter
+    private String description;
 }
