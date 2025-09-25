@@ -13,66 +13,88 @@ import com.example.demo.cores.Users.repositories.UsersRepository;
 import com.example.demo.cores.Users.specification.UserSpecification;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import com.example.demo.common.responses.ResponseCode;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
-public class UserService {
-    private final UsersRepository usersRepository;
+public class UserService implements IUserService {
+    @Autowired
+    private UsersRepository usersRepository;
 
-    public UserService(UsersRepository usersRepository) {
-        this.usersRepository = usersRepository;
+    @Autowired
+    private Executor taskExecutor;
+
+    @Override
+    public CompletableFuture<List<Users>> GetAsync(QueryUsersDto queryDto) {
+        return CompletableFuture.supplyAsync(() -> {
+            // 使用 Specification 進行動態查詢
+            Specification<Users> spec = UserSpecification.createSpecification(queryDto);
+            return usersRepository.findAll(spec);
+        }, taskExecutor);
     }
 
-    public List<Users> Get(QueryUsersDto queryDto) {
-        // 使用 Specification 進行動態查詢
-        Specification<Users> spec = UserSpecification.createSpecification(queryDto);
-        return usersRepository.findAll(spec);
-    }
-
-    public Users GetById(Long id) {
-        return usersRepository.findById(id)
+    @Override
+    public CompletableFuture<Users> GetByIdAsync(Long id) {
+        return CompletableFuture.supplyAsync(() -> usersRepository.findById(id)
                 .orElseThrow(
                         () -> new BusinessException(ResponseCode.NOT_FOUND_ID,
-                                "User not found with id: " + id));
+                                "User not found with id: " + id)),
+                taskExecutor);
     }
 
-    public Users GetByName(String name) {
-        return usersRepository.findByName(name)
+    @Override
+    public CompletableFuture<Users> GetByNameAsync(String name) {
+        return CompletableFuture.supplyAsync(() -> usersRepository.findByName(name)
                 .orElseThrow(
                         () -> new BusinessException(ResponseCode.NOT_FOUND_NAME,
-                                "User not found with name: " + name));
+                                "User not found with name: " + name)),
+                taskExecutor);
     }
 
-    public Users Create(InsertUsersDto insertDto) {
-        return usersRepository.save(insertDto.toEntity());
+    @Override
+    public CompletableFuture<Users> CreateAsync(InsertUsersDto insertDto) {
+        return CompletableFuture.supplyAsync(() -> usersRepository.save(insertDto.toEntity()),
+                taskExecutor);
     }
 
-    public Users Update(UpdateUsersDto updateDto, Long id) {
-        Users users = usersRepository.findById(id)
-                .orElseThrow(
-                        () -> new BusinessException(ResponseCode.NOT_FOUND_ID,
-                                "User not found with id: " + id));
+    @Override
+    public CompletableFuture<Users> UpdateAsync(UpdateUsersDto updateDto, Long id) {
+        return CompletableFuture.supplyAsync(() -> {
+            Users users = usersRepository.findById(id)
+                    .orElseThrow(
+                            () -> new BusinessException(ResponseCode.NOT_FOUND_ID,
+                                    "User not found with id: " + id));
 
-        users = updateDto.UpdateEntity(users);
-        return usersRepository.save(users);
+            users = updateDto.UpdateEntity(users);
+            return usersRepository.save(users);
+        }, taskExecutor);
     }
 
-    public Users UpdatePwd(UpdateUsersPwdDto updateDto, Long id) {
-        Users users = usersRepository.findById(id)
-                .orElseThrow(
-                        () -> new BusinessException(ResponseCode.NOT_FOUND_ID,
-                                "User not found with id: " + id));
+    @Override
+    public CompletableFuture<Users> UpdatePwdAsync(UpdateUsersPwdDto updateDto, Long id) {
+        return CompletableFuture.supplyAsync(() -> {
+            Users users = usersRepository.findById(id)
+                    .orElseThrow(
+                            () -> new BusinessException(ResponseCode.NOT_FOUND_ID,
+                                    "User not found with id: " + id));
 
-        users = updateDto.UpdateEntity(users);
-        return usersRepository.save(users);
+            users = updateDto.UpdateEntity(users);
+            return usersRepository.save(users);
+        }, taskExecutor);
     }
 
-    public void Delete(Long id) {
-        Users users = usersRepository.findById(id)
-                .orElseThrow(
-                        () -> new BusinessException(ResponseCode.NOT_FOUND_ID,
-                                "User not found with id: " + id));
+    @Override
+    public CompletableFuture<Void> DeleteAsync(Long id) {
+        return CompletableFuture.supplyAsync(() -> {
+            Users users = usersRepository.findById(id)
+                    .orElseThrow(
+                            () -> new BusinessException(ResponseCode.NOT_FOUND_ID,
+                                    "User not found with id: " + id));
 
-        usersRepository.delete(users);
+            usersRepository.delete(users);
+            return null;
+        }, taskExecutor);
     }
 }
